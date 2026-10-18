@@ -1,0 +1,861 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d0d0d">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="LifeDrop">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>LifeDrop – Blood Donors & Requests</title>
+<style>
+:root{--onbtn:#f3d9d4;--onsel:#f3d9d4;--bg:#0d0d0d;--hdr:#4a2220;--card:#1a1a1a;--card2:#2d1b1b;--text:#e6c9c4;--muted:#9e8884;--acc:#e08a80;--btn:#6b2a24;--sel:#5e2d28;--field:#262626;--track:#3a2a28;--line:#2a2020}
+html[data-theme=light]{--onbtn:#fff;--onsel:#3a2422;--bg:#fbf6f5;--card:#fff;--card2:#fbeae8;--text:#3a2422;--muted:#8a7370;--acc:#b3261e;--btn:#b3261e;--sel:#f6d5d0;--field:#f1e8e6;--track:#eadbd8;--line:#efe3e1}
+html[data-theme=light] body{background:#e9e2e0}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%;overscroll-behavior:none}
+button,nav,.top{-webkit-user-select:none;user-select:none}
+@media (display-mode:standalone){#app{height:100dvh}}
+#app{height:100dvh}
+html,body{margin:0;height:100%;background:#050505;color:var(--text);font-family:Roboto,system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+#app{max-width:480px;height:100%;margin:0 auto;background:var(--bg);position:relative;display:flex;flex-direction:column;overflow:hidden}
+main{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:16px}
+.page{display:none}.page.on{display:block}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+input,select{font:inherit;color:var(--text);background:var(--field);border:1px solid transparent;border-radius:10px;padding:13px 14px;width:100%;outline:none}
+input:focus{border-color:var(--btn)}
+input::placeholder{color:#777}
+h1,h2,h3,p{margin:0}
+.pad{padding:0 12px}
+.top{display:flex;align-items:center;gap:10px;padding:16px 12px 8px}
+.top h2{font-size:22px;font-weight:500;flex:1}
+.top .step{font-size:14px;color:var(--acc);font-weight:700}
+.icon{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px}
+.sec{margin:16px 14px 6px;color:var(--muted);font-weight:700;font-size:15px}
+.card{background:var(--card);border-radius:22px;margin:6px 12px;padding:14px}
+.card.alt{background:var(--card2)}
+.lbl{color:var(--muted);font-size:12px;font-weight:700;margin:12px 0 6px;letter-spacing:.3px}.lbl:first-child{margin-top:0}
+.row{display:flex;align-items:center;gap:10px}.sp{justify-content:space-between}
+.grow{flex:1;min-width:0}
+.btn{background:var(--btn);color:var(--onbtn);border-radius:26px;padding:15px;font-weight:700;font-size:16px;text-align:center;width:100%;display:block}
+.btn.ghost{background:none;color:var(--acc)}
+.btn.sm{width:auto;padding:9px 18px;font-size:14px;border-radius:20px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid #5a4a48;border-radius:22px;padding:10px 16px;font-size:14px;font-weight:600;background:var(--bg)}
+.chip.on{background:var(--sel);border-color:var(--sel)}
+.chip.on::before{content:"✓ "}
+.tag{border-radius:10px;padding:3px 9px;font-size:11px;font-weight:700}
+.tag.Critical{background:#5a1a1a;color:#ff8a80}.tag.Urgent{background:#5b4a14;color:#e3b82f}.tag.Scheduled{background:#173a2a;color:#7fd6a4}
+.tag.av{background:#173a2a;color:#7fd6a4}.tag.na{background:#5b4a14;color:#e3b82f}
+.badge{background:#3a1c18;border-radius:16px;padding:6px 12px;font-weight:700;font-size:14px;color:var(--acc)}
+.avatar{width:56px;height:56px;border-radius:50%;background:#2f5560;color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center;flex:none}
+/* home */
+.hero{background:var(--hdr);border-radius:0 0 34px 34px;padding:20px 14px 18px}
+.search{background:var(--card2);border-radius:30px;padding:17px 20px;color:var(--muted);font-size:16px;margin-top:18px;text-align:left;width:100%}
+.hello small{display:block;color:#c9a8a2;font-size:16px}.hello b{font-size:22px;color:#fff}
+.bell{background:var(--card2)}
+.loc{display:flex;align-items:center;gap:12px;width:calc(100% - 24px);margin:12px 12px 8px;background:var(--card);border-radius:22px;padding:16px;text-align:left}
+.loc small{color:var(--muted);display:block;font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:10px 12px}
+.tile{background:var(--card);border-radius:22px;padding:20px 4px;text-align:center;font-size:13px;font-weight:700}
+.tile i{display:block;font-style:normal;font-size:26px;margin-bottom:8px}
+.big{display:flex;align-items:center;gap:14px;width:calc(100% - 24px);margin:10px 12px;background:var(--card);border-radius:22px;padding:16px;text-align:left}
+.big b{font-size:18px;display:block}.big span{color:var(--muted);font-size:14px}
+.rq{margin:8px 12px;background:var(--card);border-radius:20px;padding:14px}
+.rq .t{font-weight:700;font-size:16px}.rq .m{color:var(--muted);font-size:13px;margin-top:3px}
+.rq a.call{color:var(--acc);font-weight:700;text-decoration:none}
+.empty{text-align:center;color:#666;padding:90px 20px;font-size:17px}
+/* nav */
+nav{display:flex;align-items:center;justify-content:space-around;background:var(--bg);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom));position:relative}
+nav button{flex:1;padding:6px 0;font-size:12px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;border-radius:20px}
+nav button span{font-size:20px;padding:3px 18px;border-radius:16px}
+nav button.on{color:var(--onsel);font-weight:700}nav button.on span{background:var(--sel)}
+nav .fab{flex:none;width:66px;height:66px;margin:-24px 4px 0;border-radius:50%;background:var(--btn);font-size:28px;color:#e6d5d2;box-shadow:0 4px 14px #0008;flex-direction:row;justify-content:center;align-items:center;padding:0}
+/* progress */
+.bar{height:8px;border-radius:5px;background:var(--track);overflow:hidden;margin:12px 0 8px}.bar i{display:block;height:100%;background:var(--acc)}
+.prog{display:flex;gap:6px;padding:0 14px}.prog i{height:5px;border-radius:3px;background:var(--track);flex:1}.prog i.on{background:var(--btn)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 12px;text-align:center}
+.stats div{background:var(--card);border-radius:20px;padding:16px 4px;font-size:12px}.stats b{display:block;font-size:26px;color:var(--acc);margin-bottom:4px}
+.badges{display:flex;gap:8px;margin:6px 12px;overflow-x:auto}
+.badges div{background:var(--card);border-radius:22px;padding:14px 8px;text-align:center;min-width:92px;flex:1;font-size:12px;opacity:.38}
+.badges div.on{opacity:1}.badges i{display:block;font-style:normal;font-size:24px;margin-bottom:4px}.badges b{display:block;font-size:14px}
+.list{margin:6px 12px;background:var(--card);border-radius:22px;overflow:hidden}
+.list button{display:flex;gap:14px;align-items:center;width:100%;text-align:left;padding:16px;border-bottom:1px solid var(--line)}
+.list button:last-child{border:0}.list b{display:block;font-size:17px}.list small{color:var(--muted);font-size:14px}
+.rd{display:flex;gap:10px;margin:6px 0 4px}.rd button{flex:1;padding:12px;border-radius:14px;background:var(--card);font-weight:600}
+.rd button.on{background:var(--sel)}
+.q{padding:14px 4px;border-bottom:1px solid var(--line)}.q:last-child{border:0}.q p{font-weight:700;font-size:16px}
+.acc{width:calc(100% - 24px);margin:8px 12px 0;background:var(--card);border-radius:22px;padding:18px;display:flex;justify-content:space-between;font-size:17px;font-weight:700;text-align:left}
+.accb{margin:0 12px;background:var(--card);border-radius:0 0 22px 22px;padding:4px 18px 16px;color:#cdb2ad;line-height:1.6;display:none;font-size:14px}.accb.on{display:block}
+.rv{display:flex;justify-content:space-between;gap:12px;padding:7px 0;font-size:14px}.rv span{color:var(--muted)}.rv b{text-align:right}
+.foot{display:flex;gap:10px;padding:14px 12px}.foot .btn.ghost{width:40%}
+.sw{width:52px;height:32px;border-radius:16px;background:var(--field);border:2px solid #7a6a68;position:relative;flex:none;transition:.2s}
+.sw::after{content:"";position:absolute;top:5px;left:6px;width:18px;height:18px;border-radius:50%;background:#9c8c8a;transition:.2s}
+.sw.on{background:#ffb3ab;border-color:#ffb3ab}.sw.on::after{left:25px;top:2px;width:24px;height:24px;background:#fff1ef}
+.frow{display:flex;align-items:center;gap:14px;padding:12px 6px;border-bottom:1px solid var(--line)}.frow:last-child{border:0}
+.frow .ic,.list .ic{width:46px;height:46px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:20px;flex:none}
+.frow input,.frow textarea{background:none;border:0;padding:2px 0;font-size:18px;color:var(--text);width:100%;outline:none;font-family:inherit}
+.frow textarea{resize:none;min-height:90px}
+.frow small{display:block;color:var(--muted);font-size:12px;font-weight:700;letter-spacing:.3px}
+.setrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 6px;border-bottom:1px solid var(--line)}.setrow:last-child{border:0}
+.setrow b{display:block;font-size:17px;font-weight:500}.setrow small{color:var(--muted);font-size:14px}
+.sel{display:flex;align-items:center;gap:12px;width:100%;background:var(--field);border-radius:30px;padding:16px 20px;font-size:18px;text-align:left}
+.gbtn{display:flex;align-items:center;justify-content:center;gap:12px;background:#5c4040;color:#fff;margin-top:14px;padding:19px}
+html[data-theme=light] .gbtn{background:#b3261e}
+.logo{width:116px;height:116px;border-radius:26px;background:#c42200;margin:0 auto;display:flex;align-items:center;justify-content:center}
+#pick button.opt{display:flex;justify-content:space-between;width:100%;padding:14px 6px;border-bottom:1px solid var(--line);font-size:16px;text-align:left}
+#pick button.opt.on{color:var(--acc);font-weight:700}
+#toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:#2b1816;color:#f3d9d4;padding:12px 20px;border-radius:24px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:20;max-width:90%;text-align:center}
+#toast.on{opacity:1}
+.hhero{background:var(--hdr);border-radius:28px;margin:6px 12px;padding:20px}
+.hhero .big1{display:flex;gap:16px;align-items:center}.hhero .big1 b{font-size:54px;line-height:1;font-weight:300;color:#fff}
+
+.hhero .big1 span{color:#d9b9b3;font-size:15px;line-height:1.35}
+.hhero .two{display:flex;justify-content:space-between;margin-top:20px}.hhero .two b{display:block;font-size:26px;font-weight:400;color:#fff}.hhero .two small{color:#d9b9b3;font-size:13px;font-weight:700}
+
+.cool{margin:8px 12px;border-radius:22px;padding:16px;background:var(--card)}
+.cool .bar{margin:10px 0 8px}.cool b{font-size:16px}.cool small{color:var(--muted);font-size:13px;display:block}
+.cool.rest{background:#3a2a10}.cool.rest small{color:#e3b82f}
+html[data-theme=light] .cool.rest{background:#fff3d6}html[data-theme=light] .cool.rest small{color:#8a6100}
+.cool.ok{background:#12301f}html[data-theme=light] .cool.ok{background:#dff3e6}
+.dr{display:flex;gap:12px;margin:8px 12px;background:var(--card);border-radius:22px;padding:14px;position:relative}
+.dr .ic2{width:46px;height:46px;border-radius:50%;background:var(--sel);display:flex;align-items:center;justify-content:center;font-size:21px;flex:none}
+.dr b{font-size:17px}.dr .m{color:var(--muted);font-size:13px;margin-top:3px}
+.dr .tp{display:inline-block;margin-top:8px;background:var(--bg);border-radius:12px;padding:3px 10px;font-size:12px;font-weight:700;color:var(--acc)}
+.dr .x{position:absolute;right:8px;top:8px;width:32px;height:32px;border-radius:50%;color:var(--muted);font-size:15px}
+.fabw{position:sticky;bottom:14px;display:flex;justify-content:flex-end;padding:0 16px;margin-top:14px;pointer-events:none}
+.fabw button{pointer-events:auto;background:var(--btn);color:var(--onbtn);border-radius:20px;padding:17px 24px;font-weight:700;font-size:16px;box-shadow:0 6px 18px #0008}
+#addDlg{margin:auto auto 0;max-width:480px;width:100%;border-radius:28px 28px 0 0;padding:14px 12px 22px;max-height:92vh;overflow:auto}
+#addDlg h3{margin:0;flex:1;font-size:22px;font-weight:500}
+#addDlg .frow input[type=date]{color-scheme:dark light}
+dialog{background:var(--card);color:var(--text);border:0;border-radius:22px;padding:20px;max-width:380px;width:88%}
+dialog::backdrop{background:#000a}dialog h3{margin-bottom:10px}dialog pre{white-space:pre-wrap;font:inherit;color:#cdb2ad;margin:0 0 14px}
+.res{margin:14px 12px;padding:16px;border-radius:18px;font-weight:700;line-height:1.5}.res.ok{background:#173a2a;color:#9fe3bd}.res.no{background:#3a1c18;color:#ff9d92}
+
+/* ===== responsive: mobile (default) · tablet ≥700px · desktop ≥1100px ===== */
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+@media (hover:hover){.rq:hover,.tile:hover,.list button:hover,.big:hover,.loc:hover,.dr:hover{filter:brightness(1.1)}.btn:hover{filter:brightness(1.12)}nav button:hover{background:var(--card)}}
+@media (min-width:700px){
+  html[data-theme=light] body{background:#e9e2e0}
+  #app{max-width:860px;box-shadow:0 0 0 1px var(--line),0 12px 48px #0006}
+  .page{max-width:820px;margin:0 auto}
+  #auth{max-width:460px}
+  #urgent,#reqList,#dList,#mList,#hList{display:grid;grid-template-columns:1fr 1fr;gap:0 4px;align-items:stretch}
+  #urgent>p,#reqList>.empty,#dList>.empty,#mList>.empty,#mList>div:not(.rq),#hList>.empty{grid-column:1/-1}
+  .rq,.dr{margin:6px 12px}
+  #mList .rq{width:auto!important}
+  .grid{gap:14px}.tile{padding:26px 6px;font-size:15px}.tile i{font-size:32px}
+  #mapBox,#mapFrame{height:52vh!important}
+  #addDlg{margin:auto;border-radius:28px;max-width:560px;padding:20px 18px 24px}
+  dialog{max-width:460px}
+  #toast{bottom:30px}
+}
+@media (min-width:1100px){
+  html,body,html[data-theme=light] body{background:var(--bg)}
+  #app{max-width:1360px;flex-direction:row;box-shadow:none;border-left:1px solid var(--line);border-right:1px solid var(--line)}
+  /* bottom bar becomes a left sidebar, always visible */
+  #nav{display:flex!important;order:-1;flex:none;width:250px;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:6px;border-top:0;border-right:1px solid var(--line);padding:22px 14px}
+  #nav::before{content:"🩸 LifeDrop";font-size:24px;font-weight:700;color:var(--acc);padding:6px 14px 22px;letter-spacing:.3px}
+  #nav button{flex:none;flex-direction:row;justify-content:flex-start;gap:14px;font-size:16px;padding:12px 14px;border-radius:16px}
+  #nav button span{padding:0;font-size:22px;width:28px;text-align:center}
+  #nav button.on{background:var(--sel)}#nav button.on span{background:none}
+  #nav .fab{order:9;margin:auto 0 0;width:100%;height:auto;border-radius:18px;padding:16px;font-size:18px;justify-content:center;gap:10px;box-shadow:none}
+  #nav .fab::after{content:"Request Blood";font-size:16px;font-weight:700}
+  main{padding:8px 28px 28px}
+  .page{max-width:1040px}
+  #auth{max-width:480px;padding-top:40px}
+  #urgent,#reqList,#dList,#mList,#hList{grid-template-columns:repeat(2,1fr)}
+  .grid{grid-template-columns:repeat(3,1fr)}
+  .hero{border-radius:30px;margin:12px 12px 0}
+  .top{padding:22px 12px 10px}.top h2{font-size:26px}
+  #mapBox,#mapFrame{height:58vh!important}
+  #toast{left:calc(50% + 125px)}
+  .fabw{padding:0 16px}
+}
+@media (min-width:1500px){#urgent,#reqList,#dList,#mList,#hList{grid-template-columns:repeat(3,1fr)}.page{max-width:1180px}}
+@media (max-height:520px) and (orientation:landscape){nav button span{font-size:17px;padding:1px 14px}nav .fab{width:50px;height:50px;margin-top:-10px}}
+</style>
+</head>
+<body>
+<div id="app">
+<main>
+
+<!-- AUTH (cloud mode only) -->
+<section class="page" id="auth">
+  <div style="padding:70px 28px 24px;text-align:center">
+    <div class="logo"><svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5C12 2.5 5 10 5 14.5a7 7 0 0 0 14 0C19 10 12 2.5 12 2.5z"/><path d="M7.5 14h2.2l1.3-2.6 2 5 1.3-2.4h2.2"/></svg></div>
+    <h1 style="font-size:34px;margin-top:30px;color:var(--text)">LifeDrop</h1>
+    <p style="color:var(--muted);font-size:18px;margin-top:8px">Saving lives, together.</p>
+  </div>
+  <div style="padding:0 28px">
+    <div class="lbl" style="font-size:15px">Select Country</div>
+    <button class="sel" data-act="pickCountry"><span id="aFlag" style="font-size:24px">🇧🇩</span><span class="grow" id="aCountry">Bangladesh</span>›</button>
+    <button class="btn gbtn" data-act="google"><svg width="22" height="22" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.9 2.4 30.4 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.4 5.7c4.3-4 6.9-9.9 6.9-17.1z"/><path fill="#FBBC05" d="M10.5 28.7c-.5-1.4-.8-3-.8-4.7s.3-3.2.8-4.7l-7.9-6.1C.9 16.4 0 20.1 0 24s.9 7.6 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.4 0 11.8-2.1 15.7-5.8l-7.4-5.7c-2.1 1.4-4.8 2.3-8.3 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>Continue</button>
+    <button class="btn ghost" data-act="emailToggle" style="margin-top:6px;font-size:14px">Use email instead</button>
+    <div id="emailBox" hidden>
+      <div class="card" style="margin:6px 0"><h3 id="aTitle" style="font-size:20px;margin-bottom:6px">Sign in</h3>
+        <div class="lbl">EMAIL</div><input id="aEmail" type="email" placeholder="you@example.com" autocomplete="email">
+        <div class="lbl">PASSWORD</div><input id="aPass" type="password" placeholder="At least 6 characters" autocomplete="current-password"></div>
+      <button class="btn" id="aBtn" data-act="authSubmit">Sign in</button>
+      <button class="btn ghost" data-act="authMode" id="aSwitch">New here? Create account</button>
+      <button class="btn ghost" style="font-size:13px;padding:6px" data-act="authReset">Forgot password?</button>
+    </div>
+    <p style="text-align:center;color:var(--muted);font-size:14px;margin:34px 0 20px;line-height:1.6">By signing in, you agree to our<br><a href="#" data-act="terms" style="color:var(--acc);font-weight:700;text-decoration:none">Terms of Service</a> and <a href="#" data-act="privacy" style="color:var(--acc);font-weight:700;text-decoration:none">Privacy Policy</a></p>
+  </div>
+</section>
+
+<!-- HOME -->
+<section class="page on" id="home">
+  <div class="hero">
+    <div class="row">
+      <button class="avatar" data-go="profile" id="hAv">K</button>
+      <div class="grow hello"><small>Good day,</small><b id="hName">Friend</b></div>
+      <button class="icon bell" data-go="requests" aria-label="Requests">🔔</button>
+    </div>
+    <button class="search" data-go="donors">🔍&nbsp; Search nearby donors</button>
+  </div>
+  <button class="loc" data-go="edit"><span style="font-size:22px">📍</span><div><small>Your Location</small><b id="hLoc">Set your location</b></div></button>
+  <div class="card alt" id="becomeCard">
+    <h3 style="font-size:20px">Become a Donor</h3>
+    <p style="color:var(--muted);margin:6px 0 14px">Register today and save up to 3 lives per donation.</p>
+    <button class="btn sm" data-go="edit">Complete Profile &nbsp;›</button>
+  </div>
+  <div class="grid">
+    <button class="tile" data-go="donors"><i>👥</i>Find Donor</button>
+    <button class="tile" data-go="requests"><i>🩸</i>Recent Requests</button>
+    <button class="tile" data-go="map"><i>🗺️</i>Blood Map</button>
+    <button class="tile" data-go="guide"><i>💡</i>Blood Guide</button>
+    <button class="tile" data-go="elig"><i>💝</i>Eligibility Check</button>
+    <button class="tile" data-go="new"><i>🩸</i>Request Blood</button>
+  </div>
+  <button class="big" data-act="hospitals">
+    <span class="icon" style="background:var(--bg)">🏥</span><div class="grow"><b>Medical Services</b><span>Find nearby hospitals, ambulance, etc.</span></div>›
+  </button>
+  <div class="row sp pad" style="margin:18px 0 0"><h3 style="font-size:18px">Urgent Requests</h3><button class="btn ghost sm" style="padding:6px 8px" data-go="requests">See all</button></div>
+  <div id="urgent"></div>
+</section>
+
+<!-- PROFILE -->
+<section class="page" id="profile">
+  <div class="top"><h2>My Profile</h2><button class="icon" data-go="edit" aria-label="Edit">✏️</button><button class="icon" data-go="settings" aria-label="Settings">⚙️</button></div>
+  <div class="card alt">
+    <div class="row"><div class="avatar" id="pAv" style="width:80px;height:80px;font-size:34px">?</div>
+      <div><div id="pName" style="font-size:24px;font-weight:700;color:#fff">Your name</div><div id="pLoc" style="margin-top:6px"></div><div id="pPhone" style="margin-top:4px"></div></div></div>
+    <p id="pBio" style="color:var(--muted);font-size:14px;margin-top:12px;display:none"></p>
+    <div class="row" style="margin-top:14px"><span class="chip" id="pGroup" style="background:#d9d9d9;color:#6b2a24;border:0">🩸 -</span><button class="chip" id="pAvail" data-act="avail" style="background:#d9d9d9;color:#8a7a78;border:0;flex:1">Not Available</button></div>
+  </div>
+  <div class="sec">Donation Progress</div>
+  <div class="card"><div class="row sp"><b style="font-size:20px" id="pRank">Rank: Beginner</b><b style="color:var(--acc)" id="pCnt">0 donations</b></div>
+    <div class="bar"><i id="pBar" style="width:1%"></i></div><div class="row sp"><span style="color:var(--muted)" id="pNext">Progress to Rising Donor</span><b id="pNum">0/1</b></div></div>
+  <div class="stats"><div><b id="sDon">0</b>Donations</div><div><b id="sLives">0</b>Lives Saved</div><div><b id="sLast">-</b>Last Help (D)</div></div>
+  <div class="sec">Badges</div>
+  <div class="badges" id="badges"></div>
+  <div class="sec">My Activities</div>
+  <div class="list">
+    <button data-act="history"><span class="icon" style="background:var(--bg)">📅</span><div class="grow"><b>Donation History</b><small id="hist">No records yet</small></div>›</button>
+    <button data-act="myreq"><span class="icon" style="background:var(--bg)">🩸</span><div class="grow"><b>My Requests</b><small id="myreq">0 requests</small></div>›</button>
+  </div>
+  <div class="pad" style="margin-top:14px"><button class="btn" data-act="addDon">➕ Add donation record</button></div>
+</section>
+
+<!-- HISTORY -->
+<section class="page" id="history">
+  <div class="top"><button class="icon" data-go="profile" aria-label="Back">←</button><h2>Donation History</h2></div>
+  <div class="hhero"><div class="big1"><b id="hLives">0+</b><span>Estimated lives impacted<br>through your donations</span></div>
+    <div class="two"><div><b id="hTot">0</b><small>Total Donations</small></div><div style="text-align:right"><b id="hLvl">Beginner</b><small>Current Level</small></div></div></div>
+  <div class="cool ok" id="hCool"></div>
+  <div class="sec">Recent Activity</div>
+  <div id="hList"></div>
+  <div class="fabw"><button data-act="addDon">＋&nbsp; Add Record</button></div>
+</section>
+
+<!-- EDIT -->
+<section class="page" id="edit">
+  <div class="top"><button class="icon" data-go="profile" aria-label="Back">←</button><h2>Edit Profile</h2><button class="btn sm" data-act="save" style="padding:14px 28px">Save</button></div>
+  <div class="sec">Personal Information</div>
+  <div class="card" style="padding:6px 14px">
+    <div class="frow"><span class="ic">👤</span><div class="grow"><small>Full Name</small><input id="eName" placeholder="Your full name" autocomplete="name"></div></div>
+    <div class="frow"><span class="ic">📍</span><div class="grow"><small>City / Area</small><input id="eCity" placeholder="Select your city or area" autocomplete="address-level2"></div></div>
+    <div class="frow" style="align-items:flex-start"><span class="ic">📞</span><div class="grow"><small>Phone</small><input id="ePhone" placeholder="01XXXXXXXXX" inputmode="tel" autocomplete="tel">
+      <div class="row" style="margin-top:8px;border:1px solid #5a4a48;border-radius:22px;padding:8px 14px;width:max-content;gap:14px"><span style="font-size:14px;font-weight:700;color:var(--muted)">Hide phone number</span><button class="sw" id="eHide" data-sw="eHide" aria-label="Hide phone number"></button></div></div></div>
+  </div>
+  <div class="pad" style="margin:2px 0 4px"><button class="chip" data-act="useLocProfile" style="width:100%;border-radius:18px;padding:12px">📍 Use my current location <span id="eLocState" style="color:var(--muted);font-weight:400"></span></button><p style="color:var(--muted);font-size:12px;margin:6px 4px">Shared with signed-in users as an approximate area (about 1 km) so people nearby can find you on the map.</p></div>
+  <div class="sec">Blood Details</div>
+  <div class="card" style="padding:6px 14px">
+    <div class="frow" style="align-items:flex-start"><span class="ic">🩸</span><div class="grow"><small>Blood Type</small><div class="chips" id="eGroups" style="margin-top:8px"></div></div></div>
+    <div class="frow"><span class="ic">💝</span><b class="grow" style="font-size:18px;font-weight:500">Available to donate</b><button class="sw" id="eAvail" data-sw="eAvail" aria-label="Available to donate"></button></div>
+  </div>
+  <div class="sec">About Me</div>
+  <div class="card" style="padding:6px 14px;margin-bottom:24px"><div class="frow" style="align-items:flex-start"><span class="ic">📝</span><div class="grow"><small>Bio</small><textarea id="eBio" maxlength="200" placeholder="Tell us about yourself…"></textarea></div></div></div>
+</section>
+
+<!-- REQUESTS -->
+<section class="page" id="requests">
+  <div class="top"><button class="icon" data-go="home" aria-label="Back">←</button><h2>Recent Requests</h2></div>
+  <div class="pad"><div class="chips" id="filters" style="flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px"></div></div>
+  <div id="reqList"></div>
+</section>
+
+<!-- NEW REQUEST (3 steps) -->
+<section class="page" id="new">
+  <div class="top"><button class="icon" data-act="newBack" aria-label="Back">←</button><h2>Request Blood</h2><span class="step" id="stepTxt">Step 1/3</span></div>
+  <div class="prog" id="stepBar"><i class="on"></i><i></i><i></i></div>
+  <div id="step1">
+    <div class="sec">Patient Details</div>
+    <div class="card"><div class="lbl">PATIENT NAME</div><input id="nPatient" placeholder="Full name of patient">
+      <div class="lbl">BLOOD TYPE</div><div class="chips" id="nGroup"></div></div>
+    <div class="sec">Urgency</div>
+    <div class="card"><div class="lbl">DONATION TYPE</div><div class="chips" id="nDon"></div>
+      <div class="lbl">UNITS REQUIRED</div><div class="chips" id="nUnits"></div>
+      <div class="lbl">URGENCY LEVEL</div><div class="chips" id="nUrg"></div></div>
+    <div class="foot"><button class="btn" data-act="next1">Continue ›</button></div>
+  </div>
+  <div id="step2" hidden>
+    <div class="sec">Location Details</div>
+    <div class="card"><div class="lbl">HOSPITAL</div><input id="nHosp" placeholder="Hospital name">
+      <div class="lbl">CITY / AREA</div><input id="nCity" placeholder="City / area">
+      <div class="lbl">ADDRESS</div><input id="nAddr" placeholder="Address">
+      <button class="chip" data-act="useLocReq" style="width:100%;margin-top:14px;border-radius:18px;padding:12px">📍 Use my current location <span id="rLocState" style="color:var(--muted);font-weight:400"></span></button></div>
+    <div class="foot"><button class="btn ghost" data-act="back2">Back</button><button class="btn" data-act="next2">Continue ›</button></div>
+  </div>
+  <div id="step3" hidden>
+    <div class="sec">Contact Information</div>
+    <div class="card"><div class="lbl">CONTACT</div><div id="rcName">-</div><div class="lbl">PHONE</div><div id="rcPhone">-</div></div>
+    <p style="color:var(--acc);font-size:12px;margin:4px 14px">These details are taken from your profile to ensure verification.</p>
+    <div class="sec">Review Request</div>
+    <div class="card" id="review"></div>
+    <div class="foot"><button class="btn ghost" data-act="back3">Back</button><button class="btn" data-act="submit">Submit</button></div>
+  </div>
+</section>
+
+<!-- DONORS -->
+<section class="page" id="donors">
+  <div class="top"><h2>Find Donor</h2></div>
+  <div class="pad"><input id="dSearch" placeholder="🔍  Search by name, city or group" style="border-radius:30px;padding:16px 20px"></div>
+  <div id="dList" style="margin-top:8px"></div>
+</section>
+
+<!-- MAP -->
+<section class="page" id="map">
+  <div class="top"><h2>Blood Map</h2><button class="icon" data-act="locate" aria-label="Use my location" style="background:var(--card)">📍</button></div>
+  <div class="pad"><div class="rd"><button id="mDon" class="on" data-act="mapDon">👥 Donors</button><button id="mReq" data-act="mapReq">♡ Requests</button><button id="mHos" data-act="mapHos">🏥 Hospitals</button></div>
+    <div id="mapBox" style="height:42vh;min-height:260px;border-radius:22px;overflow:hidden;margin:8px 0;background:var(--card);display:none"></div>
+    <iframe id="mapFrame" title="Map" loading="lazy" referrerpolicy="no-referrer-when-downgrade" hidden style="width:100%;height:42vh;min-height:260px;border:0;border-radius:22px;margin:8px 0;background:var(--card)"></iframe>
+    <p id="mNote" style="color:var(--muted);font-size:13px;margin:4px 2px 8px">Tap an entry to see it on the map.</p></div>
+  <div id="mList"></div>
+</section>
+
+<!-- ELIGIBILITY -->
+<section class="page" id="elig">
+  <div class="top"><button class="icon" data-go="home" aria-label="Back">←</button><h2>Eligibility Check</h2></div>
+  <div class="card alt row"><span class="icon" style="background:var(--bg);width:64px;height:64px;font-size:28px">💝</span><div><b style="font-size:20px">Eligibility Check</b><p style="color:var(--muted);font-size:14px;margin-top:4px">Answer a few questions to see if you are eligible to donate blood today.</p></div></div>
+  <div class="sec">Physical Details</div>
+  <div class="card"><div class="lbl">YOUR WEIGHT (KG)</div><input id="qW" type="number" inputmode="decimal" placeholder="Min 50 kg">
+    <div class="lbl">YOUR AGE (YEARS)</div><input id="qA" type="number" inputmode="numeric" placeholder="18 – 60 years"></div>
+  <div class="sec">Health Status</div>
+  <div class="card" id="qList"></div>
+  <button class="acc" data-act="more"><span>Additional Medical Info (Optional)</span><span id="moreArr">▾</span></button>
+  <div class="card" id="more" style="display:none;margin-top:2px">
+    <div class="lbl">BLOOD PRESSURE (MMHG)</div><div class="row"><input id="qSys" type="number" placeholder="e.g: 120"><b>/</b><input id="qDia" type="number" placeholder="e.g: 80"></div>
+    <div class="lbl">PULSE RATE (BPM)</div><input id="qPulse" type="number" placeholder="e.g. 60 – 100">
+    <div class="lbl">HEMOGLOBIN LEVEL (G/DL)</div><input id="qHb" type="number" step="0.1" placeholder="Min 12.5 g/dL">
+    <div class="lbl">GENDER</div><div class="rd" id="qGender"></div>
+  </div>
+  <div id="eligRes"></div>
+  <div class="foot"><button class="btn" data-act="check">Check Eligibility</button></div>
+</section>
+
+<!-- GUIDE -->
+<section class="page" id="guide">
+  <div class="top"><button class="icon" data-go="home" aria-label="Back">←</button><h2>Blood Guide</h2></div>
+  <div class="card" style="border:1px solid #3a2a28;background:var(--bg)">
+    <h3 style="font-size:18px">Blood Compatibility</h3><p style="color:var(--muted);margin:4px 0 12px;font-size:14px">Select a blood group to see compatibility</p>
+    <div class="chips" id="gChips"></div>
+    <div class="card alt" style="margin:14px 0 8px">
+      <div class="row"><div class="avatar" id="gBadge" style="background:var(--sel);width:64px;height:64px;font-size:20px">A+</div><b style="font-size:18px">Compatibility Info</b></div>
+      <div class="lbl" style="margin-top:16px">CAN GIVE TO</div><div class="chips" id="gGive"></div>
+      <div class="lbl">CAN RECEIVE FROM</div><div class="chips" id="gRecv"></div>
+    </div>
+    <p style="color:var(--muted);font-style:italic;font-size:14px">Tip: O- is the universal donor.</p>
+  </div>
+  <button class="acc" data-acc="a1"><span>🩸&nbsp; Preparation</span><span>▾</span></button>
+  <div class="accb" id="a1">• Eat a healthy meal and drink plenty of water.<br>• Get a good night's sleep.<br>• Bring a photo ID.<br>• Avoid fatty food before donating.</div>
+  <button class="acc" data-acc="a2"><span>❤&nbsp; Aftercare</span><span>▾</span></button>
+  <div class="accb" id="a2">• Rest 10–15 minutes and keep drinking fluids.<br>• Avoid heavy lifting and hard exercise today.<br>• Keep the bandage on for several hours.<br>• You can donate whole blood again after 90 days.</div>
+  <button class="acc" data-acc="a3"><span>💝&nbsp; Why Donate?</span><span>▾</span></button>
+  <div class="accb" id="a3">• One donation can save up to 3 lives.<br>• Blood cannot be manufactured; it only comes from donors.<br>• Patients with accidents, surgery, cancer and blood disorders depend on it.</div>
+</section>
+
+<!-- SETTINGS -->
+<section class="page" id="settings">
+  <div class="top"><button class="icon" data-go="profile" aria-label="Back">←</button><h2>Settings</h2></div>
+  <div class="sec">Appearance</div>
+  <div class="list"><button data-act="theme"><span class="ic">🌙</span><div class="grow"><b>Theme mode</b><small id="sTheme" style="color:var(--acc)">System Default</small></div>›</button></div>
+  <div class="sec" id="sInstSec" hidden>App</div>
+  <div class="list" id="sInstList" hidden><button data-act="install"><span class="ic">📲</span><div class="grow"><b>Install LifeDrop app</b><small id="sInstTxt" style="color:var(--acc)">Add to your home screen</small></div>›</button></div>
+  <div class="sec">General</div>
+  <div class="list">
+    <button data-act="pickCountrySet"><span class="ic">📍</span><div class="grow"><b>Country</b><small id="sCountry" style="color:var(--acc)">Bangladesh</small></div>›</button>
+    <button data-act="radius"><span class="ic">🗺️</span><div class="grow"><b>Search Radius</b><small id="sRadius" style="color:var(--acc)">50 km</small></div>›</button>
+    <button data-go="notif"><span class="ic">🔔</span><div class="grow"><b>Notifications</b></div>›</button>
+  </div>
+  <div class="sec">Support &amp; Info</div>
+  <div class="list">
+    <button data-act="faq"><span class="ic">❓</span><div class="grow"><b>FAQ</b></div>›</button>
+    <button data-act="contact"><span class="ic">✉️</span><div class="grow"><b>Contact us</b></div>›</button>
+    <button data-act="share"><span class="ic">🔗</span><div class="grow"><b>Share app</b></div>›</button>
+    <button data-act="rate"><span class="ic">⭐</span><div class="grow"><b>Rate us</b></div>›</button>
+    <button data-act="privacy"><span class="ic">🛡️</span><div class="grow"><b>Privacy Policy</b></div>›</button>
+    <button data-act="about"><span class="ic">ℹ️</span><div class="grow"><b>About LifeDrop</b><small>Version 1.0.0</small></div>›</button>
+  </div>
+  <div class="sec">Manage Account</div>
+  <div class="list">
+    <button data-act="logout" id="rowLogout"><span class="ic">🚪</span><div class="grow"><b>Logout</b></div>›</button>
+    <button data-act="delAccount"><span class="ic" style="color:var(--acc)">🗑️</span><div class="grow"><b style="color:var(--acc)">Delete Account</b><small id="delSub"></small></div>›</button>
+  </div>
+  <div style="height:20px"></div>
+</section>
+
+<!-- NOTIFICATION SETTINGS -->
+<section class="page" id="notif">
+  <div class="top"><button class="icon" data-go="settings" aria-label="Back">←</button><h2>Notification Settings</h2></div>
+  <div class="card alt row" style="padding:18px 18px"><span style="font-size:22px">🔔</span><b class="grow" style="font-size:19px;font-weight:500">Push Notifications</b><button class="sw" id="nOn" data-sw="nOn" aria-label="Push notifications"></button></div>
+  <div class="sec">Alerts</div>
+  <div class="card" style="padding:4px 14px">
+    <div class="setrow"><div><b>Critical Requests</b><small>Get alerts for life-threatening emergencies</small></div><button class="sw" id="nCritical" data-sw="nCritical"></button></div>
+    <div class="setrow"><div><b>Urgent Requests</b><small>Notifications for urgent blood needs</small></div><button class="sw" id="nUrgent" data-sw="nUrgent"></button></div>
+    <div class="setrow"><div><b>Scheduled Requests</b><small>Alerts for planned blood donations</small></div><button class="sw" id="nScheduled" data-sw="nScheduled"></button></div>
+  </div>
+  <div class="sec">Blood Type</div>
+  <div class="card"><p style="color:var(--muted);margin-bottom:12px">Select the blood groups you want to be notified about.</p><div class="chips" id="nGroups"></div></div>
+  <p style="color:var(--muted);font-size:12px;margin:10px 18px">Alerts are shown by your browser while LifeDrop is open or running in the background.</p>
+</section>
+
+</main>
+
+<nav id="nav">
+  <button data-go="home" data-nav="home"><span>🏠</span>Home</button>
+  <button data-go="map" data-nav="map"><span>🗺️</span>Map</button>
+  <button class="fab" data-act="openNew" aria-label="Request Blood">❤</button>
+  <button data-go="donors" data-nav="donors"><span>👥</span>Donors</button>
+  <button data-go="profile" data-nav="profile"><span>👤</span>Profile</button>
+</nav>
+</div>
+<div id="toast"></div>
+<dialog id="dirDlg" style="max-width:480px;width:94%;padding:12px"><div class="row sp" style="margin-bottom:8px"><h3>Directions</h3><button class="btn ghost sm" id="dirClose" style="padding:6px 10px">Close ✕</button></div><iframe id="dirFrame" title="Directions" referrerpolicy="no-referrer-when-downgrade" style="width:100%;height:62vh;border:0;border-radius:14px"></iframe></dialog>
+<dialog id="pick"><h3 id="pTitle"></h3><div id="pOpts"></div><button class="btn ghost sm" style="margin-top:8px" id="pCancel">Cancel</button></dialog>
+<dialog id="addDlg">
+  <div class="row" style="margin-bottom:10px"><button class="icon" id="addX" aria-label="Close" style="color:var(--acc)">✕</button><h3>Add Donation</h3><button class="btn sm" data-act="saveDon" style="padding:13px 26px">Save</button></div>
+  <div class="sec" style="margin:8px 4px">Donation Details</div>
+  <div class="card" style="margin:6px 0;padding:6px 10px">
+    <div class="frow"><span class="ic">📅</span><div class="grow"><small>Donation Date</small><input type="date" id="dDate"></div></div>
+    <div class="frow"><span class="ic">🏥</span><div class="grow"><small>Hospital</small><input id="dHosp" placeholder="e.g. General Hospital" maxlength="80"></div></div>
+    <div class="frow"><span class="ic">🗺️</span><div class="grow"><small>Address</small><input id="dAddr" placeholder="Detailed address info" maxlength="120"></div></div>
+    <div class="frow"><span class="ic">🩸</span><div class="grow"><small>Donation Type</small><div class="chips" id="dType" style="margin-top:8px"></div></div></div>
+  </div>
+  <div class="sec" style="margin:12px 4px 6px">Additional Info</div>
+  <div class="card" style="margin:6px 0;padding:6px 10px"><div class="frow"><span class="ic">📝</span><div class="grow"><small>Add notes…</small><textarea id="dNotes" placeholder="Add notes…" maxlength="300" style="min-height:70px"></textarea></div></div></div>
+  <p class="m" style="color:var(--muted);font-size:13px;margin:12px 6px 0">🔒 After you donate you are hidden from Find Donor for 90 days, then you appear again automatically.</p>
+</dialog>
+<dialog id="dlg"><h3 id="dTitle"></h3><pre id="dBody"></pre><button class="btn sm" id="dClose">OK</button></dialog>
+
+<script>
+"use strict";
+const GROUPS=["A+","A-","B+","B-","AB+","AB-","O+","O-"];
+const RECV={"O-":["O-"],"O+":["O+","O-"],"A-":["A-","O-"],"A+":["A+","A-","O+","O-"],"B-":["B-","O-"],"B+":["B+","B-","O+","O-"],"AB-":["AB-","A-","B-","O-"],"AB+":GROUPS};
+const GIVE=g=>GROUPS.filter(x=>RECV[x].includes(g));
+const DON=["Whole Blood","Platelets","Plasma","Double Red Cells"],UNITS=["1","2","3","4","5"],URG=["Critical","Urgent","Scheduled"];
+/* ====== Shared database (Firebase). Paste your web-app config to enable; leave apiKey empty to run on this device only. ====== */
+const FIREBASE_CONFIG={apiKey:"",authDomain:"",projectId:"",appId:""};
+/* ====== Google Maps. Paste a Maps JavaScript API key (with Geocoding API enabled); leave empty for list-only mode. ====== */
+const GMAPS_KEY="";
+const KEY="lifedrop.v1",PK="lifedrop.prefs",GK="lifedrop.geo";
+let deferredInstall=null;
+const isStandalone=()=>matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+const isIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent);
+function showInstall(){const show=!isStandalone()&&(deferredInstall||isIOS());["#sInstSec","#sInstList"].forEach(i=>{const e=$(i);if(e)e.hidden=!show})}
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstall=e;showInstall()});
+addEventListener("appinstalled",()=>{deferredInstall=null;showInstall();toast("LifeDrop installed")});
+if("serviceWorker"in navigator&&location.protocol.startsWith("http"))addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+const APP_VERSION="1.0.0",CONTACT_EMAIL=""; /* set CONTACT_EMAIL to enable "Contact us" / "Rate us" */
+const COUNTRIES={"Bangladesh":"🇧🇩","India":"🇮🇳","Pakistan":"🇵🇰","Nepal":"🇳🇵","Sri Lanka":"🇱🇰","United Arab Emirates":"🇦🇪","Saudi Arabia":"🇸🇦","Qatar":"🇶🇦","United Kingdom":"🇬🇧","United States":"🇺🇸"};
+let PR={theme:"system",country:"Bangladesh",radius:50,notif:{on:false,Critical:true,Urgent:true,Scheduled:true,groups:["A+","A-","B+","B-","AB+","AB-","O+","O-"]}};
+try{const x=JSON.parse(localStorage.getItem(PK)||"{}");PR=Object.assign(PR,x);PR.notif=Object.assign({},PR.notif,x.notif||{})}catch(e){}
+const savePrefs=()=>{try{localStorage.setItem(PK,JSON.stringify(PR))}catch(e){}};
+const THEMES={system:"System Default",light:"Light",dark:"Dark"};
+function applyTheme(){const dark=PR.theme==="dark"||(PR.theme==="system"&&matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.dataset.theme=dark?"dark":"light";const m=document.querySelector('meta[name=theme-color]');if(m)m.content=dark?"#0d0d0d":"#fbf6f5"}
+matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change",()=>PR.theme==="system"&&applyTheme());
+const DEF={profile:{name:"",phone:"",city:"",group:"",available:false,hidePhone:false,bio:"",lat:null,lng:null,count:0,last:0,history:[]},requests:[],donors:[]};
+let S;try{S=Object.assign({},DEF,JSON.parse(localStorage.getItem(KEY)||"{}"));S.profile=Object.assign({},DEF.profile,S.profile)}catch(e){S=JSON.parse(JSON.stringify(DEF))}
+const fmtD=t=>new Date(t).toLocaleDateString("en-GB");
+S.profile.history=(S.profile.history||[]).map((h,i)=>typeof h==="string"?{id:"o"+i,at:Date.parse(h)||0,label:h}:h);
+const lastOf=p=>Math.max(p.last||0,...(p.history||[]).map(h=>h.at||0));
+let cloud=null;
+const save=()=>{if(cloud)return;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+async function initCloud(){
+  if(!FIREBASE_CONFIG.apiKey)return false;
+  const u=m=>`https://www.gstatic.com/firebasejs/10.12.2/firebase-${m}.js`;
+  const [A,Au,F]=await Promise.all([import(u("app")),import(u("auth")),import(u("firestore"))]);
+  const app=A.initializeApp(FIREBASE_CONFIG);
+  cloud={Au,F,auth:Au.getAuth(app),db:F.getFirestore(app),subs:[]};
+  return true;
+}
+function startCloud(){
+  const {Au,F,auth,db}=cloud,err=e=>toast("Database error: "+(e.code||e.message));
+  Au.onAuthStateChanged(auth,user=>{
+    cloud.subs.forEach(f=>f());cloud.subs=[];
+    seen=null;if(!user){S.uid="";S.profile=JSON.parse(JSON.stringify(DEF.profile));S.requests=[];S.donors=[];go("auth");return}
+    S.uid=user.uid;
+    cloud.subs.push(F.onSnapshot(F.doc(db,"users",user.uid),s=>{S.profile=Object.assign({},DEF.profile,s.data()||{});render()},err));
+    cloud.subs.push(F.onSnapshot(F.query(F.collection(db,"requests"),F.orderBy("at","desc"),F.limit(200)),s=>{S.requests=s.docs.map(d=>({...d.data(),id:d.id}));notifyNew(S.requests);render()},err));
+    cloud.subs.push(F.onSnapshot(F.collection(db,"donors"),s=>{S.donors=s.docs.map(d=>d.data());render()},err));
+    if(page==="auth"){go("home");deepLink()}
+  });
+}
+let seen=null;
+const wants=r=>PR.notif.on&&PR.notif[r.urg]!==false&&PR.notif.groups.includes(r.group);
+function notifyNew(list){
+  if(seen===null){seen=new Set(list.map(r=>r.id));return}
+  list.filter(r=>!seen.has(r.id)).forEach(r=>{seen.add(r.id);
+    if(r.uid===S.uid||r.open===false||!wants(r))return;
+    const title=`${r.group} blood needed (${r.urg})`,body=`${r.units} unit(s) at ${r.hospital}${r.city?", "+r.city:""}`;
+    toast(title);try{if("Notification"in window&&Notification.permission==="granted")new Notification(title,{body})}catch(e){}});
+}
+function syncProfile(){
+  if(!cloud||!S.uid)return;const {F,db}=cloud,p=P();
+  F.setDoc(F.doc(db,"users",S.uid),p).catch(e=>toast("Save failed: "+e.code));
+  if(hasProfile())F.setDoc(F.doc(db,"donors",S.uid),{lat:p.lat??null,lng:p.lng??null,uid:S.uid,name:p.name,phone:p.hidePhone?"":p.phone,hidePhone:!!p.hidePhone,city:p.city,group:p.group,available:!!p.available,count:p.count||0,last:lastOf(p),bio:p.bio||""}).catch(()=>{});
+}
+const authMsg=e=>({"auth/invalid-credential":"Wrong email or password","auth/user-not-found":"No account with that email","auth/wrong-password":"Wrong password","auth/email-already-in-use":"That email already has an account","auth/invalid-email":"Enter a valid email","auth/weak-password":"Password needs 6+ characters","auth/network-request-failed":"No internet connection"}[e.code]||e.message);
+let authMode="in";
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const P=()=>S.profile,hasProfile=()=>!!(P().name&&P().phone&&P().group);
+const DAY=864e5;
+let page="home",step=1,filter="All",guideSel="A+",mapMode="donors",gender="Male";
+const form={group:"A+",don:"Whole Blood",units:"1",urg:"Urgent"};
+const q={ill:false,meds:false,tat:false};
+
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("on"),2400)}
+function dialog(title,body){$("#dTitle").textContent=title;$("#dBody").textContent=body;const d=$("#dlg");d.showModal?d.showModal():alert(title+"\n\n"+body)}
+$("#dClose").onclick=()=>$("#dlg").close();
+$("#addX").onclick=()=>$("#addDlg").close();
+
+function go(p){
+  if(p==="edit"){$("#eName").value=P().name;$("#ePhone").value=P().phone;$("#eCity").value=P().city;$("#eBio").value=P().bio||"";eGroup=P().group;eLoc=P().lat!=null?{lat:P().lat,lng:P().lng}:null;$("#eLocState").textContent=eLoc?"✓ saved":"";
+    $("#eHide").classList.toggle("on",!!P().hidePhone);$("#eAvail").classList.toggle("on",!!P().available);renderEdit()}
+  if(p==="settings")renderSettings();
+  if(p==="map")mapSig="";
+  if(p==="notif")renderNotif();
+  if(p==="auth"){$("#aFlag").textContent=COUNTRIES[PR.country]||"🌍";$("#aCountry").textContent=PR.country}
+  if(p==="elig")renderQ();
+  page=p;$$(".page").forEach(e=>e.classList.toggle("on",e.id===p));
+  $("#nav").style.display=["home","profile","donors","map"].includes(p)?"flex":"none";
+  $$("[data-nav]").forEach(b=>b.classList.toggle("on",b.dataset.nav===p));
+  $("main").scrollTop=0;render();
+}
+function chips(el,items,cur,fn){el.innerHTML=items.map(v=>`<button class="chip${v===cur?" on":""}" data-v="${esc(v)}">${esc(v)}</button>`).join("");el.querySelectorAll("button").forEach(b=>b.onclick=()=>fn(b.dataset.v))}
+const ago=t=>{const m=Math.round((Date.now()-t)/6e4);return m<1?"just now":m<60?m+" min ago":m<1440?Math.round(m/60)+" h ago":Math.round(m/1440)+" d ago"};
+const COOL=90;
+const daysSince=()=>{const l=lastOf(P());return l?Math.floor((Date.now()-l)/DAY):null};
+const resting=l=>!!l&&Date.now()-l<COOL*DAY;
+const restLeft=l=>Math.max(0,Math.ceil((l+COOL*DAY-Date.now())/DAY));
+const isMine=r=>cloud?r.uid===S.uid:(!!P().phone&&r.phone===P().phone);
+const myReqs=()=>S.requests.filter(isMine);
+
+function reqCard(r,i,mine){
+  return `<div class="rq"><div class="row sp"><div class="row"><span class="badge">${esc(r.group)}</span><span class="t">${esc(r.units)} unit(s) for ${esc(r.patient)}</span></div><span class="tag ${esc(r.urg)}">${esc(r.urg)}</span></div>
+  <div class="m">🏥 ${esc(r.hospital)}${r.city?", "+esc(r.city):""}${r.addr?" · "+esc(r.addr):""}</div>
+  <div class="m">${esc(r.don)} · ${ago(r.at)}</div>
+  <div class="row" style="margin-top:10px;gap:18px"><a class="call" href="tel:${esc(r.phone)}">📞 Call</a>${mine?`<button class="call" style="color:var(--muted)" data-done="${r.id}">Mark fulfilled</button>`:""}</div></div>`
+}
+
+function render(){
+  const p=P(),n=p.name;
+  // home
+  $("#hName").textContent=n||"Friend";$("#hAv").textContent=(n||"K")[0].toUpperCase();
+  $("#hLoc").textContent=p.city||"Set your location";$("#becomeCard").style.display=hasProfile()?"none":"block";
+  const open=S.requests.filter(r=>r.open!==false);
+  $("#urgent").innerHTML=open.length?open.slice(0,3).map(r=>reqCard(r,0,isMine(r))).join(""):`<p style="text-align:center;color:#666;padding:18px">No urgent requests</p>`;
+  // profile
+  const c=p.count||0,rank=c<1?["Beginner","Rising",1]:c<5?["Rising","Regular",5]:c<10?["Regular","Hero",10]:["Hero","Legend",c];
+  $("#pAv").textContent=(n||"?")[0].toUpperCase();$("#pName").textContent=n||"Your name";
+  $("#pLoc").textContent="📍 "+(p.city||"No location");$("#pPhone").textContent="📞 "+(p.phone||"No phone number");
+  $("#pGroup").textContent="🩸 "+(p.group||"-");const bio=$("#pBio");bio.textContent=p.bio||"";bio.style.display=p.bio?"block":"none";
+  const av=$("#pAvail"),lp=lastOf(p);av.textContent=resting(lp)?"Resting · "+restLeft(lp)+"d":p.available?"Available":"Not Available";av.style.background=p.available&&!resting(lp)?"var(--sel)":"#d9d9d9";av.style.color=p.available&&!resting(lp)?"#fff":"#8a7a78";
+  $("#pRank").textContent="Rank: "+rank[0];$("#pCnt").textContent=c+" donations";$("#pNext").textContent="Progress to "+rank[1]+" Donor";$("#pNum").textContent=c+"/"+rank[2];
+  $("#pBar").style.width=Math.max(1,Math.min(100,Math.round(c*100/rank[2])))+"%";
+  $("#sDon").textContent=c;$("#sLives").textContent=c*3;const ds=daysSince();$("#sLast").textContent=ds===null?"-":ds+"d";
+  $("#badges").innerHTML=[["⭐","Beginner","New Member",0],["🌱","Rising","1+ donations",1],["🏆","Regular","5+ donations",5],["👑","Hero","10+ donations",10]].map(b=>`<div class="${c>=b[3]?"on":""}"><i>${b[0]}</i><b>${b[1]}</b>${b[2]}</div>`).join("");
+  $("#hist").textContent=p.history.length?p.history.length+" record(s)":"No records yet";$("#myreq").textContent=myReqs().length+" request(s)";
+  // requests page
+  if(page==="requests"){
+    chips($("#filters"),["All Types","Critical","Urgent","Scheduled"],filter==="All"?"All Types":filter,v=>{filter=v==="All Types"?"All":v;render()});
+    const list=open.filter(r=>filter==="All"||r.urg===filter);
+    $("#reqList").innerHTML=list.length?list.map(r=>reqCard(r,0,isMine(r))).join(""):`<div class="empty">No requests found</div>`;
+  }
+  if(page==="donors")renderDonors();
+  if(page==="history")renderHistory();
+  if(page==="map")renderMap();
+  if(page==="guide")renderGuide();
+  $$("[data-done]").forEach(b=>b.onclick=()=>{const r=S.requests.find(x=>x.id===b.dataset.done);if(!r)return;
+    if(cloud)cloud.F.updateDoc(cloud.F.doc(cloud.db,"requests",r.id),{open:false}).then(()=>toast("Marked as fulfilled")).catch(e=>toast("Failed: "+e.code));
+    else{r.open=false;save();render();toast("Marked as fulfilled")}});
+}
+function allDonors(){ // shared list = other saved donors + me
+  const list=S.donors.filter(d=>d.name&&d.group&&!resting(d.last)&&(cloud?d.uid!==S.uid:d.phone!==P().phone));
+  if(hasProfile()&&!resting(lastOf(P())))list.push({name:P().name,phone:P().phone,city:P().city,group:P().group,available:P().available,count:P().count,bio:P().bio,lat:P().lat,lng:P().lng,me:true});
+  return list;
+}
+const TYPES=["Whole Blood","Platelets","Plasma","Double Red Cells"],TICON={"Whole Blood":"🩸","Platelets":"🟡","Plasma":"💧","Double Red Cells":"❤️"};
+let addType="Whole Blood";
+function renderHistory(){
+  const p=P(),c=p.count||0,l=lastOf(p),lvl=c<1?"Beginner":c<5?"Rising":c<10?"Regular":"Hero";
+  $("#hLives").textContent=c*3+"+";$("#hTot").textContent=c;$("#hLvl").textContent=lvl;
+  const cool=$("#hCool");
+  if(resting(l)){const left=restLeft(l),pct=Math.min(100,Math.round((COOL-left)*100/COOL));
+    cool.className="cool rest";cool.innerHTML=`<b>⏳ Resting · ${left} day${left===1?"":"s"} left</b><div class="bar"><i style="width:${Math.max(2,pct)}%"></i></div><small>You can donate again on ${fmtD(l+COOL*DAY)}. You are hidden from Find Donor until then and will reappear automatically.</small>`}
+  else{cool.className="cool ok";cool.innerHTML=`<b>✅ You can donate now</b><small>${l?"Last donation: "+fmtD(l)+". ":""}${p.available?"You are visible in Find Donor.":"Turn on Available in your profile to appear in Find Donor."}</small>`}
+  const rows=[...p.history].sort((a,b)=>(b.at||0)-(a.at||0));
+  $("#hList").innerHTML=rows.length?rows.map(h=>`<div class="dr"><span class="ic2">${TICON[h.type]||"🩸"}</span><div class="grow"><b>${h.at?fmtD(h.at):esc(h.label||"")}</b>
+   <div class="m">🏥 ${esc(h.hospital||"Hospital not added")}</div>${h.addr?`<div class="m">📍 ${esc(h.addr)}</div>`:""}${h.notes?`<div class="m">📝 ${esc(h.notes)}</div>`:""}<span class="tp">${esc(h.type||"Whole Blood")}</span></div>
+   <button class="x" data-deldon="${esc(h.id)}" aria-label="Delete record">🗑</button></div>`).join(""):`<div class="empty" style="padding:50px 20px">No records yet</div>`;
+}
+function drawTypes(){chips($("#dType"),TYPES,addType,v=>{addType=v;drawTypes()})}
+function openAdd(){
+  if(!P().phone){toast("Complete your profile (name and phone) first");return go("edit")}
+  const t=new Date(),iso=new Date(t-t.getTimezoneOffset()*6e4).toISOString().slice(0,10);
+  $("#dDate").value=iso;$("#dDate").max=iso;["#dHosp","#dAddr","#dNotes"].forEach(i=>$(i).value="");
+  addType="Whole Blood";drawTypes();
+  const d=$("#addDlg");d.showModal?d.showModal():d.setAttribute("open","");
+}
+function renderDonors(){
+  const t=$("#dSearch").value.trim().toLowerCase();
+  const l=allDonors().filter(d=>!t||[d.name,d.city,d.group].some(x=>String(x||"").toLowerCase().includes(t)));
+  $("#dList").innerHTML=l.length?l.map(d=>`<div class="rq"><div class="row"><div class="avatar" style="width:48px;height:48px;font-size:20px">${esc((d.name||"?")[0].toUpperCase())}</div>
+   <div class="grow"><div class="row sp"><b>${esc(d.name)}</b><span class="tag ${d.available?"av":"na"}">${d.available?"Available":"Not Available"}</span></div>
+   <div class="m">📍 ${esc(d.city||"—")}</div></div></div>
+   <div class="row sp" style="margin-top:10px"><span class="badge">🩸 ${esc(d.group)}</span><span class="m">♥ ${d.count||0} donations</span>${d.phone?`<a class="call" href="tel:${esc(d.phone)}">📞 Call</a>`:`<span class="m">🔒 Phone hidden</span>`}</div>${d.bio?`<div class="m" style="margin-top:8px">${esc(d.bio)}</div>`:""}</div>`).join(""):`<div class="empty">No donors found</div>`;
+}
+/* ---------- Google Maps ---------- */
+let gmLoading=null,gmap=null,gInfo=null,gCoder=null,gMarkers=[],here=null,mapSeq=0,mapSig="";
+let GEO={};try{GEO=JSON.parse(localStorage.getItem(GK)||"{}")}catch(e){}
+const URG_COLOR={Critical:"#d32f2f",Urgent:"#f9a825",Scheduled:"#2e9e68"};
+function loadMaps(){
+  if(!GMAPS_KEY)return Promise.reject(new Error("no key"));
+  if(window.google&&google.maps&&google.maps.Map)return Promise.resolve();
+  return gmLoading||(gmLoading=new Promise((res,rej)=>{
+    window.__gmReady=()=>res();window.gm_authFailure=()=>{$("#mNote").textContent="Google Maps rejected the API key. Check the key, its allowed websites and enabled APIs.";rej(new Error("auth"))};
+    const sc=document.createElement("script");sc.async=true;sc.src="https://maps.googleapis.com/maps/api/js?key="+encodeURIComponent(GMAPS_KEY)+"&callback=__gmReady";
+    sc.onerror=()=>{gmLoading=null;rej(new Error("load"))};document.head.appendChild(sc)}));
+}
+const km=(a,b)=>{const r=Math.PI/180,dl=(b.lat-a.lat)*r,dn=(b.lng-a.lng)*r,x=Math.sin(dl/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dn/2)**2;return 12742*Math.asin(Math.sqrt(x))};
+async function geocode(q){
+  q=(q||"").trim();if(!q)return null;if(q in GEO)return GEO[q];
+  try{gCoder=gCoder||new google.maps.Geocoder();const r=await gCoder.geocode({address:q});const l=r.results&&r.results[0]&&r.results[0].geometry.location;
+    const v=l?{lat:+(+l.lat()).toFixed(4),lng:+(+l.lng()).toFixed(4)}:null;GEO[q]=v;try{localStorage.setItem(GK,JSON.stringify(GEO))}catch(e){}return v}catch(e){return null}
+}
+async function reverseCity(lat,lng){
+  try{await loadMaps();gCoder=gCoder||new google.maps.Geocoder();const r=await gCoder.geocode({location:{lat,lng}});
+    const c=(r.results[0]?.address_components||[]);const pick=t=>c.find(x=>x.types.includes(t))?.long_name;
+    return pick("sublocality_level_1")||pick("locality")||pick("administrative_area_level_2")||""}catch(e){return ""}
+}
+const getPos=()=>new Promise((res,rej)=>{if(!navigator.geolocation)return rej(new Error("unsupported"));navigator.geolocation.getCurrentPosition(p=>res({lat:p.coords.latitude,lng:p.coords.longitude}),rej,{enableHighAccuracy:false,timeout:10000,maximumAge:60000})});
+const DARK_MAP=[{elementType:"geometry",stylers:[{color:"#1d1d1d"}]},{elementType:"labels.text.fill",stylers:[{color:"#9e8884"}]},{elementType:"labels.text.stroke",stylers:[{color:"#1d1d1d"}]},{featureType:"road",elementType:"geometry",stylers:[{color:"#2f2a29"}]},{featureType:"water",elementType:"geometry",stylers:[{color:"#0f1a24"}]},{featureType:"poi",stylers:[{visibility:"off"}]}];
+const gmapsLink=(q,p)=>"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(p?p.lat+","+p.lng:q);
+const dirLink=(p,q)=>"https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(p?p.lat+","+p.lng:q);
+function mapRows(){
+  if(mapMode==="donors")return allDonors().map(d=>({kind:"d",group:d.group,title:d.name,sub:d.city||"",q:d.city,pos:d.lat!=null&&d.lng!=null?{lat:d.lat,lng:d.lng}:null,phone:d.phone,color:d.available?"#c62828":"#7a6a68",extra:d.available?"Available":"Not available"}));
+  return S.requests.filter(r=>r.open!==false).map(r=>({kind:"r",group:r.group,title:r.patient,sub:r.hospital+(r.city?", "+r.city:""),q:[r.hospital,r.city].filter(Boolean).join(", "),pos:r.lat!=null&&r.lng!=null?{lat:r.lat,lng:r.lng}:null,phone:r.phone,color:URG_COLOR[r.urg]||"#c62828",extra:r.urg+" · "+r.units+" unit(s)"}));
+}
+const esc2=esc;
+function infoHtml(r){return `<div style="font-family:system-ui;color:#222;min-width:170px"><b>${esc2(r.group)} · ${esc2(r.title)}</b><br>${esc2(r.sub)}<br><small>${esc2(r.extra)}${r.dist!=null?" · "+r.dist.toFixed(1)+" km":""}</small><br><a href="#" data-dir="${esc2(r.pos?r.pos.lat+","+r.pos.lng:(r.q||""))}">Directions</a>${r.phone?` · <a href="tel:${esc2(r.phone)}">Call</a>`:""}</div>`}
+function mapList(rows){
+  $("#mList").innerHTML=rows.length?rows.map((r,i)=>`<button class="rq" data-mi="${i}" style="display:block;width:calc(100% - 24px);text-align:left"><div class="row"><span class="badge" style="background:${r.color}22;color:${r.color}">${esc(r.group)}</span><div class="grow"><b>${esc(r.title)}</b><div class="m">📍 ${esc(r.sub||"—")}</div></div><span class="m">${r.dist!=null?r.dist.toFixed(1)+" km":(r.pos?"":"—")}</span></div></button>`).join(""):`<div class="empty">${here?"Nothing within "+PR.radius+" km":"Nothing to show yet"}</div>`;
+  $$("#mList [data-mi]").forEach(b=>b.onclick=()=>{const r=rows[+b.dataset.mi];if(r.marker&&gmap){gmap.panTo(r.pos);gmap.setZoom(Math.max(gmap.getZoom(),13));gInfo.setContent(infoHtml(r));gInfo.open(gmap,r.marker);$("#mapBox").scrollIntoView({behavior:"smooth",block:"nearest"})}
+    else if(!GMAPS_KEY||mapMode==="hospitals"){showFrame(r.q||r.sub);$("#mapFrame").scrollIntoView({behavior:"smooth",block:"nearest"})}
+    else toast("This place couldn't be located on the map")});
+}
+async function openDirections(dest){
+  if(!dest)return;if(!here){try{here=await getPos()}catch(e){}}
+  $("#dirFrame").src="https://maps.google.com/maps?"+(here?"saddr="+here.lat+","+here.lng+"&":"")+"daddr="+encodeURIComponent(dest)+"&output=embed";
+  const d=$("#dirDlg");d.showModal?d.showModal():toast("Directions aren't supported in this browser")}
+$("#dirClose").onclick=()=>{$("#dirDlg").close();$("#dirFrame").src="about:blank"};
+const embedUrl=q=>"https://maps.google.com/maps?q="+encodeURIComponent(q)+"&z=13&output=embed";
+let frameSrc="";
+function showFrame(q){const f=$("#mapFrame");$("#mapBox").style.display="none";f.hidden=false;const u=embedUrl(q);if(frameSrc!==u){frameSrc=u;f.src=u}}
+function hideFrame(){$("#mapFrame").hidden=true}
+async function renderMap(){
+  $("#mDon").classList.toggle("on",mapMode==="donors");$("#mReq").classList.toggle("on",mapMode==="requests");$("#mHos").classList.toggle("on",mapMode==="hospitals");
+  if(mapMode==="hospitals"){
+    mapSig="";++mapSeq;const where=here?here.lat+","+here.lng:(P().city||PR.country);
+    $("#mList").innerHTML=`<div class="empty" style="padding:24px 20px;font-size:15px">Hospitals near ${esc(here?"you":where)}. Tap 📍 to centre on your location.</div>`;
+    $("#mNote").textContent="";return showFrame("hospitals near "+where)}
+  hideFrame();
+  const rows=mapRows(),sig=JSON.stringify([mapMode,rows.map(r=>[r.title,r.q,r.pos]),here,PR.radius,document.documentElement.dataset.theme]);
+  if(sig===mapSig&&gmap)return;mapSig=sig;const seq=++mapSeq;
+  mapList(rows);
+  if(!GMAPS_KEY){const first=rows[0];showFrame(first?first.q||first.sub:(P().city||PR.country));$("#mNote").textContent=rows.length?"Tap an entry to show it on the map. Add a Google Maps key in index.html to see every pin at once.":"";return}
+  $("#mNote").textContent="Loading map…";
+  try{await loadMaps()}catch(e){if(seq===mapSeq&&e.message!=="auth")$("#mNote").textContent="Couldn't load Google Maps. Check your connection and API key.";return}
+  if(seq!==mapSeq)return;
+  const box=$("#mapBox");box.style.display="block";
+  if(!gmap){gmap=new google.maps.Map(box,{center:{lat:23.78,lng:90.4},zoom:7,mapTypeControl:false,streetViewControl:false,fullscreenControl:false,clickableIcons:false});gInfo=new google.maps.InfoWindow()}
+  gmap.setOptions({styles:document.documentElement.dataset.theme==="dark"?DARK_MAP:[]});
+  for(const r of rows){if(!r.pos){r.pos=await geocode(r.q);if(seq!==mapSeq)return}}
+  if(here)for(const r of rows)if(r.pos)r.dist=km(here,r.pos);
+  let shown=rows.filter(r=>r.pos);if(here){shown=shown.filter(r=>r.dist<=PR.radius);shown.sort((a,b)=>a.dist-b.dist)}
+  gMarkers.forEach(m=>m.setMap(null));gMarkers=[];
+  const bounds=new google.maps.LatLngBounds();
+  shown.forEach(r=>{const m=new google.maps.Marker({position:r.pos,map:gmap,title:r.title,label:{text:r.group,color:"#fff",fontWeight:"700",fontSize:"11px"},icon:{path:google.maps.SymbolPath.CIRCLE,scale:16,fillColor:r.color,fillOpacity:1,strokeColor:"#fff",strokeWeight:2}});
+    m.addListener("click",()=>{gInfo.setContent(infoHtml(r));gInfo.open(gmap,m)});r.marker=m;gMarkers.push(m);bounds.extend(r.pos)});
+  if(here){const m=new google.maps.Marker({position:here,map:gmap,title:"You are here",icon:{path:google.maps.SymbolPath.CIRCLE,scale:8,fillColor:"#1a73e8",fillOpacity:1,strokeColor:"#fff",strokeWeight:3}});gMarkers.push(m);bounds.extend(here)}
+  if(shown.length||here){if(shown.length+(here?1:0)===1){gmap.setCenter(shown[0]?shown[0].pos:here);gmap.setZoom(13)}else gmap.fitBounds(bounds,40)}
+  mapList(here?shown:rows);
+  $("#mNote").textContent=here?`Showing ${shown.length} within ${PR.radius} km of you (change in Settings → Search Radius).`:`Showing ${shown.length} of ${rows.length} on the map. Tap 📍 to filter near you.`;
+}
+function renderSettings(){showInstall();
+  $("#sTheme").textContent=THEMES[PR.theme];$("#sCountry").textContent=(COUNTRIES[PR.country]||"")+" "+PR.country;$("#sRadius").textContent=PR.radius+" km";
+  $("#rowLogout").style.display=cloud?"flex":"none";$("#delSub").textContent=cloud?"Removes your profile, donor card and requests":"Clears the data stored on this device";
+}
+function renderNotif(){
+  const n=PR.notif;$("#nOn").classList.toggle("on",!!n.on);["Critical","Urgent","Scheduled"].forEach(k=>$("#n"+k).classList.toggle("on",n[k]!==false));
+  $("#nGroups").innerHTML=GROUPS.map(g=>`<button class="chip${n.groups.includes(g)?" on":""}" data-g="${g}">${g}</button>`).join("");
+  $$("#nGroups [data-g]").forEach(b=>b.onclick=()=>{const i=n.groups.indexOf(b.dataset.g);i<0?n.groups.push(b.dataset.g):n.groups.splice(i,1);savePrefs();renderNotif()});
+}
+function choose(title,opts,cur,cb){
+  $("#pTitle").textContent=title;$("#pOpts").innerHTML=opts.map(([v,l])=>`<button class="opt${v===cur?" on":""}" data-v="${esc(v)}"><span>${esc(l)}</span>${v===cur?"✓":""}</button>`).join("");
+  const d=$("#pick");$$("#pOpts .opt").forEach(b=>b.onclick=()=>{d.close();cb(b.dataset.v)});d.showModal()
+}
+$("#pCancel").onclick=()=>$("#pick").close();
+const swHandlers={
+  nOn(on){PR.notif.on=on;savePrefs();if(on){if(!("Notification"in window)){toast("This browser doesn't support notifications");PR.notif.on=false;savePrefs();return renderNotif()}
+    Notification.requestPermission().then(p=>{if(p!=="granted"){PR.notif.on=false;savePrefs();renderNotif();toast("Notifications are blocked in your browser settings")}})}},
+  nCritical(on){PR.notif.Critical=on;savePrefs()},nUrgent(on){PR.notif.Urgent=on;savePrefs()},nScheduled(on){PR.notif.Scheduled=on;savePrefs()}
+};
+function renderGuide(){
+  chips($("#gChips"),GROUPS,guideSel,v=>{guideSel=v;renderGuide()});$("#gBadge").textContent=guideSel;
+  $("#gGive").innerHTML=GIVE(guideSel).map(g=>`<span class="chip" style="border-color:#6b2a24">${g}</span>`).join("");
+  $("#gRecv").innerHTML=RECV[guideSel].map(g=>`<span class="chip" style="border-color:#1f5a35">${g}</span>`).join("");
+}
+function renderQ(){
+  const defs=[["ill","Do you have fever, cold or cough?"],["meds","Are you taking any antibiotics or heavy medication?"],["tat","Did you have a tattoo or surgery in the last 6 months?"]];
+  $("#qList").innerHTML=defs.map(([k,t])=>`<div class="q"><p>${t}</p><div class="rd"><button data-q="${k}" data-a="1" class="${q[k]?"on":""}">${q[k]?"◉":"○"} Yes</button><button data-q="${k}" data-a="0" class="${q[k]?"":"on"}">${q[k]?"○":"◉"} No</button></div></div>`).join("");
+  $$("#qList [data-q]").forEach(b=>b.onclick=()=>{q[b.dataset.q]=b.dataset.a==="1";renderQ()});
+  $("#qGender").innerHTML=["Male","Female"].map(g=>`<button data-g="${g}" class="${gender===g?"on":""}">${gender===g?"◉":"○"} ${g}</button>`).join("");
+  $$("#qGender [data-g]").forEach(b=>b.onclick=()=>{gender=b.dataset.g;renderQ()});
+}
+function renderForm(){
+  chips($("#nGroup"),GROUPS,form.group,v=>{form.group=v;renderForm()});chips($("#nDon"),DON,form.don,v=>{form.don=v;renderForm()});
+  chips($("#nUnits"),UNITS,form.units,v=>{form.units=v;renderForm()});chips($("#nUrg"),URG,form.urg,v=>{form.urg=v;renderForm()});
+}
+let eGroup="",eLoc=null;
+function renderEdit(){chips($("#eGroups"),GROUPS,eGroup,v=>{eGroup=v;renderEdit()})}
+function setStep(n){step=n;[1,2,3].forEach(i=>$("#step"+i).hidden=i!==n);$("#stepTxt").textContent="Step "+n+"/3";$$("#stepBar i").forEach((e,i)=>e.classList.toggle("on",i<n));$("main").scrollTop=0}
+function openNew(){
+  Object.assign(form,{group:"A+",don:"Whole Blood",units:"1",urg:"Urgent",lat:null,lng:null});$("#rLocState").textContent="";["#nPatient","#nHosp","#nCity","#nAddr"].forEach(s=>$(s).value="");
+  setStep(1);renderForm();go("new");
+}
+const need=(v,m)=>{if(!String(v).trim()){toast(m);return false}return true};
+const numOut=(id,lo,hi)=>{const v=$(id).value;return v!==""&&(+v<lo||+v>hi)};
+
+const actions={
+  emailToggle(){const b=$("#emailBox");b.hidden=!b.hidden},
+  async google(){if(!cloud)return toast("Cloud sign-in isn't set up");const {Au,auth}=cloud;
+    try{await Au.signInWithPopup(auth,new Au.GoogleAuthProvider())}catch(e){
+      if(e.code==="auth/popup-blocked"||e.code==="auth/operation-not-supported-in-this-environment")Au.signInWithRedirect(auth,new Au.GoogleAuthProvider());
+      else if(e.code!=="auth/popup-closed-by-user"&&e.code!=="auth/cancelled-popup-request")toast(authMsg(e))}},
+  pickCountry(){choose("Select Country",Object.keys(COUNTRIES).map(c=>[c,COUNTRIES[c]+"  "+c]),PR.country,v=>{PR.country=v;savePrefs();$("#aFlag").textContent=COUNTRIES[v];$("#aCountry").textContent=v})},
+  pickCountrySet(){choose("Country",Object.keys(COUNTRIES).map(c=>[c,COUNTRIES[c]+"  "+c]),PR.country,v=>{PR.country=v;savePrefs();renderSettings()})},
+  theme(){choose("Theme mode",Object.entries(THEMES),PR.theme,v=>{PR.theme=v;savePrefs();applyTheme();renderSettings()})},
+  radius(){choose("Search Radius",[5,10,25,50,100].map(n=>[String(n),n+" km"]),String(PR.radius),v=>{PR.radius=+v;savePrefs();renderSettings()})},
+  faq(){dialog("FAQ","Who can donate?\nHealthy adults aged 18–60 weighing at least 50 kg. Use Eligibility Check for a quick guide.\n\nHow often can I donate?\nWhole blood: every 90 days.\n\nHow do I get help finding blood?\nTap the ❤ button, fill in the request and donors with a matching group can call you.\n\nWho sees my phone number?\nSigned-in users can see it in Find Donor unless you turn on “Hide phone number”. Requests you post always include the contact number so donors can reach you.")},
+  contact(){CONTACT_EMAIL?location.href="mailto:"+CONTACT_EMAIL+"?subject="+encodeURIComponent("LifeDrop support"):toast("Contact email isn't configured yet")},
+  rate(){CONTACT_EMAIL?location.href="mailto:"+CONTACT_EMAIL+"?subject="+encodeURIComponent("LifeDrop feedback"):toast("Thanks! Feedback isn't configured yet")},
+  async share(){const d={title:"LifeDrop",text:"Find blood donors and post blood requests with LifeDrop.",url:location.href.split("#")[0]};
+    try{if(navigator.share)await navigator.share(d);else{await navigator.clipboard.writeText(d.url);toast("Link copied")}}catch(e){}},
+  privacy(){dialog("Privacy Policy","What LifeDrop stores\n• Your name, phone, city, blood group, availability, bio and donation history.\n• Blood requests you post.\n\nWho can see it\n• Signed-in users can see your donor card (phone hidden if you choose) and your requests.\n• Your donation history is visible only to you.\n\nControl\n• You can edit your profile any time and delete your account and data from Settings.\n\n(Replace this text with your organisation's own policy before a public launch.)")},
+  terms(){dialog("Terms of Service","LifeDrop connects people who need blood with willing donors. It is not a medical service and does not verify donors or requests. Always confirm details with the hospital and follow medical advice. Use the app honestly and respectfully.\n\n(Replace with your own terms before a public launch.)")},
+  install(){if(deferredInstall){deferredInstall.prompt();deferredInstall.userChoice.finally(()=>{deferredInstall=null;showInstall()})}
+    else dialog("Install LifeDrop",isIOS()?"1. Tap the Share button in Safari.\n2. Choose “Add to Home Screen”.\n3. Tap Add.":"Open the browser menu and choose “Install app” or “Add to Home screen”.")},
+  about(){dialog("About LifeDrop","LifeDrop v"+APP_VERSION+"\nSaving lives, together.")},
+  logout(){if(cloud&&confirm("Sign out of LifeDrop?"))cloud.Au.signOut(cloud.auth)},
+  async delAccount(){
+    if(!confirm("Delete your account and all your data permanently? This cannot be undone."))return;
+    if(!cloud){try{localStorage.removeItem(KEY)}catch(e){}S=JSON.parse(JSON.stringify(DEF));toast("Data deleted from this device");return go("home")}
+    const {F,db,Au,auth}=cloud;
+    try{
+      const mine=await F.getDocs(F.query(F.collection(db,"requests"),F.where("uid","==",S.uid)));
+      await Promise.all(mine.docs.map(d=>F.deleteDoc(F.doc(db,"requests",d.id))));
+      await F.deleteDoc(F.doc(db,"donors",S.uid));await F.deleteDoc(F.doc(db,"users",S.uid));
+      await Au.deleteUser(auth.currentUser);toast("Account deleted")
+    }catch(e){toast(e.code==="auth/requires-recent-login"?"Your data was removed. Sign out and back in, then delete again to remove your login.":"Failed: "+(e.code||e.message))}},
+  authMode(){authMode=authMode==="in"?"up":"in";$("#aTitle").textContent=$("#aBtn").textContent=authMode==="in"?"Sign in":"Create account";$("#aSwitch").textContent=authMode==="in"?"New here? Create account":"Have an account? Sign in"},
+  async authSubmit(){const e=$("#aEmail").value.trim(),p=$("#aPass").value;if(!e||p.length<6)return toast("Enter your email and a password (6+ characters)");
+    try{await (authMode==="up"?cloud.Au.createUserWithEmailAndPassword(cloud.auth,e,p):cloud.Au.signInWithEmailAndPassword(cloud.auth,e,p));$("#aPass").value="";if(authMode==="up")actions.authMode()}catch(x){toast(authMsg(x))}},
+  async authReset(){const e=$("#aEmail").value.trim();if(!e)return toast("Type your email first");try{await cloud.Au.sendPasswordResetEmail(cloud.auth,e);toast("Password reset email sent")}catch(x){toast(authMsg(x))}},
+  avail(){if(!P().phone){toast("Complete your profile first");return go("edit")}P().available=!P().available;save();syncProfile();render();toast(P().available?"You're visible to those who need blood":"You're hidden from donor search")},
+  history(){go("history")},addDon(){openAdd()},
+  myreq(){const l=myReqs();dialog("My Requests",l.length?l.map(r=>`${r.group} — ${r.patient} — ${r.hospital}${r.open===false?" (fulfilled)":""}`).join("\n"):"No requests yet.")},
+  saveDon(){const p=P(),v=$("#dDate").value;if(!v)return toast("Pick the donation date");
+    const at=new Date(v+"T12:00:00").getTime();if(isNaN(at)||at>Date.now()+DAY)return toast("Date can't be in the future");
+    p.history.push({id:"d"+Date.now().toString(36),at,hospital:$("#dHosp").value.trim(),addr:$("#dAddr").value.trim(),type:addType,notes:$("#dNotes").value.trim()});
+    p.count=(p.count||0)+1;p.last=lastOf(p);save();syncProfile();$("#addDlg").close();render();
+    toast(resting(p.last)?"Saved. You're hidden from Find Donor for 90 days":"Saved")},
+  save(){
+    if(!need($("#eName").value,"Enter your name")||!need($("#ePhone").value,"Enter your phone")||!eGroup)return eGroup?0:toast("Pick your blood group");
+    Object.assign(P(),{name:$("#eName").value.trim(),phone:$("#ePhone").value.trim(),city:$("#eCity").value.trim(),group:eGroup,hidePhone:$("#eHide").classList.contains("on"),available:$("#eAvail").classList.contains("on"),bio:$("#eBio").value.trim(),lat:eLoc?eLoc.lat:null,lng:eLoc?eLoc.lng:null});
+    save();syncProfile();toast("Profile saved");go("profile")},
+  openNew,
+  newBack(){step>1?setStep(step-1):go("requests")},
+  next1(){if(need($("#nPatient").value,"Enter the patient's name"))setStep(2)},
+  back2(){setStep(1)},back3(){setStep(2)},
+  next2(){if(!need($("#nHosp").value,"Enter the hospital name"))return;
+    $("#rcName").textContent=P().name||"-";$("#rcPhone").textContent=P().phone||"-";
+    const rows=[["Patient Name",$("#nPatient").value.trim()],["Blood Type",form.group],["Donation Type",form.don],["Needed",form.units+" unit(s)"],["Urgency",form.urg],["Hospital",$("#nHosp").value.trim()],["Location",$("#nCity").value.trim()],["Address",$("#nAddr").value.trim()]];
+    $("#review").innerHTML=rows.map(r=>`<div class="rv"><span>${r[0]}</span><b>${esc(r[1]||"-")}</b></div>`).join("");setStep(3)},
+  submit(){
+    if(!P().phone){toast("Complete your profile (name and phone) first");return go("edit")}
+    const r={patient:$("#nPatient").value.trim(),group:form.group,don:form.don,units:form.units,urg:form.urg,hospital:$("#nHosp").value.trim(),city:$("#nCity").value.trim(),addr:$("#nAddr").value.trim(),phone:P().phone,at:Date.now(),open:true,lat:form.lat??null,lng:form.lng??null};
+    filter="All";
+    if(cloud){r.uid=S.uid;cloud.F.addDoc(cloud.F.collection(cloud.db,"requests"),r).then(()=>{toast("Request submitted");go("requests")}).catch(e=>toast("Failed: "+e.code))}
+    else{r.id=String(Date.now());S.requests.unshift(r);save();toast("Request submitted");go("requests")}},
+mapDon(){mapMode="donors";renderMap()},mapReq(){mapMode="requests";renderMap()},mapHos(){mapMode="hospitals";renderMap()},hospitals(){mapMode="hospitals";go("map")},
+  async locate(){try{const p=await getPos();here=p;mapSig="";toast("Using your location");renderMap()}catch(e){toast("Couldn't get your location. Allow location access and try again.")}},
+  async useLocProfile(){try{const p=await getPos();const lat=+p.lat.toFixed(2),lng=+p.lng.toFixed(2);eLoc={lat,lng};$("#eLocState").textContent="✓ saved";
+      if(!$("#eCity").value.trim()&&GMAPS_KEY){const c=await reverseCity(lat,lng);if(c)$("#eCity").value=c}toast("Approximate location added — tap Save")}catch(e){toast("Couldn't get your location")}},
+  async useLocReq(){try{const p=await getPos();form.lat=+p.lat.toFixed(4);form.lng=+p.lng.toFixed(4);$("#rLocState").textContent="✓ added";
+      if(!$("#nCity").value.trim()&&GMAPS_KEY){const c=await reverseCity(form.lat,form.lng);if(c)$("#nCity").value=c}toast("Location added to your request")}catch(e){toast("Couldn't get your location")}},
+  more(){const m=$("#more"),o=m.style.display==="none";m.style.display=o?"block":"none";$("#moreArr").textContent=o?"▴":"▾"},
+  check(){
+    const m=[],age=$("#qA").value,w=$("#qW").value,ds=daysSince();
+    if(age===""||+age<18||+age>60)m.push("Age must be 18–60.");
+    if(w===""||+w<50)m.push("Minimum weight is 50 kg.");
+    if(ds!==null&&ds<90)m.push(`Wait ${90-ds} more day(s) since your last donation.`);
+    if(q.ill)m.push("Not while you have fever, cold or cough.");if(q.meds)m.push("Not while on antibiotics or heavy medication.");if(q.tat)m.push("Wait 6 months after a tattoo or surgery.");
+    if(numOut("#qSys",90,180))m.push("Systolic pressure should be 90–180.");if(numOut("#qDia",50,100))m.push("Diastolic pressure should be 50–100.");
+    if(numOut("#qPulse",50,100))m.push("Pulse should be 50–100 bpm.");if($("#qHb").value!==""&&+$("#qHb").value<12.5)m.push("Hemoglobin must be at least 12.5 g/dL.");
+    $("#eligRes").innerHTML=m.length?`<div class="res no">${m.map(x=>"• "+esc(x)).join("<br>")}</div>`:`<div class="res ok">You appear eligible to donate. Thank you!<br><small style="font-weight:400">General guidance only — staff at the donation centre make the final call.</small></div>`;
+    $("#eligRes").scrollIntoView({behavior:"smooth",block:"center"})}
+};
+document.addEventListener("click",e=>{
+  const g=e.target.closest("[data-go]");if(g)return go(g.dataset.go);
+  const dd=e.target.closest("[data-deldon]");if(dd){const p=P(),n=p.history.length;p.history=p.history.filter(h=>h.id!==dd.dataset.deldon);if(p.history.length<n){p.count=Math.max(0,(p.count||0)-1);p.last=Math.max(0,...p.history.map(h=>h.at||0));save();syncProfile();render();toast("Record deleted")}return}
+  const a=e.target.closest("[data-act]");if(a&&actions[a.dataset.act])return actions[a.dataset.act]();
+  const c=e.target.closest("[data-acc]");if(c)$("#"+c.dataset.acc).classList.toggle("on");
+  const dr=e.target.closest("[data-dir]");if(dr){e.preventDefault();return openDirections(dr.dataset.dir)}
+  const w=e.target.closest("[data-sw]");if(w){const on=w.classList.toggle("on");swHandlers[w.dataset.sw]?.(on)}
+});
+$("#dSearch").addEventListener("input",renderDonors);
+applyTheme();render();renderQ();renderForm();
+const DL=new URLSearchParams(location.search).get("go");
+function deepLink(){if(!DL)return;if(DL==="new")actions.openNew();else if(["donors","map","requests"].includes(DL))go(DL)}
+if(!FIREBASE_CONFIG.apiKey)deepLink();
+if(FIREBASE_CONFIG.apiKey){go("auth");initCloud().then(ok=>{if(ok)startCloud();else go("home")}).catch(()=>{cloud=null;go("home");toast("Cloud unavailable – using this device only")})}
+</script>
+</body>
+</html>
